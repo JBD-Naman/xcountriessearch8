@@ -1,55 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import CountryCard from './CountryCard';
 import './App.css';
 
-const App = () => {
-    const [countries, setCountries] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+function App() {
+  const [countries, setCountries] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        // Fetch country data from API
-        const fetchCountries = async () => {
-            try {
-                const response = await fetch('https://countries-search-data-prod-812920491762.asia-south1.run.app/countries');
-                if (!response.ok) throw new Error('Network response was not ok.');
-                const data = await response.json();
-                setCountries(data);
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
-        };
+  // Fetch data from API on initial render
+  useEffect(() => {
+    fetch('https://countries-search-data-prod-812920491762.asia-south1.run.app/countries')
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched countries:", data); // Debug: Check the structure
+        setCountries(data);
+      })
+      .catch((error) => {
+        console.error('API fetch error:', error);
+      });
+  }, []);
 
-        fetchCountries();
-    }, []);
-
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value.toLowerCase());
-    };
-
-    const filteredCountries = countries.filter((country) =>
-        country.name.common.toLowerCase().includes(searchTerm)
-    );
-
+  // Filter countries based on search input
+  const filteredCountries = countries.filter((country) => {
     return (
-        <div className="App">
-            <input
-                type="text"
-                placeholder="Search for a country..."
-                value={searchTerm}
-                onChange={handleSearch}
-                className="searchBar"
-            />
-            <div className="countryContainer">
-                {filteredCountries.map((country) => (
-                    <CountryCard
-                        key={country.cca3}
-                        name={country.name.common}
-                        flag={country.flags.png}
-                    />
-                ))}
-            </div>
-        </div>
+      country?.name?.common &&
+      country.name.common.toLowerCase().includes(searchTerm.toLowerCase())
     );
-};
+  });
+
+  return (
+    <div className="App">
+      <h1>Country Search App</h1>
+      <input
+        type="text"
+        placeholder="Search"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      <div className="countriesContainer">
+        {filteredCountries.length > 0 ? (
+          filteredCountries.map((country, index) => (
+            <CountryCard
+              key={index}
+              name={country.name.common}
+              flag={country.flags?.png || ''}
+            />
+          ))
+        ) : (
+          <p>No matching countries found</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default App;
