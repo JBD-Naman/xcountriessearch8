@@ -23,7 +23,7 @@ function App() {
   }, []);
 
   const filteredCountries = countries.filter((country) =>
-    country?.common?.toLowerCase().includes(searchTerm.toLowerCase())
+    country?.name?.common?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -40,8 +40,8 @@ function App() {
           filteredCountries.map((country, index) => (
             <CountryCard
               key={index}
-              name={country.common}
-              flag={country.png}
+              name={country.name.common}
+              flag={country.flags.png}
             />
           ))
         ) : (
