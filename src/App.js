@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import CountryCard from "./CountryCard";
 
 function App() {
   const [countries, setCountries] = useState([]);
@@ -22,7 +23,9 @@ function App() {
   }, []);
 
   const filteredCountries = countries.filter((country) =>
-    (country?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
+    (country?.name?.common || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -37,14 +40,11 @@ function App() {
       <div className="countriesContainer">
         {filteredCountries.length > 0 ? (
           filteredCountries.map((country, index) => (
-            <div key={index} className="countryCard">
-              <img
-                src={country.flag}
-                alt={`Flag of ${country.name}`}
-                className="flagImage"
-              />
-              <p>{country.name}</p>
-            </div>
+            <CountryCard
+              key={index}
+              name={country.name?.common}
+              flag={country.flags?.png}
+            />
           ))
         ) : (
           <p>No matching countries found</p>
