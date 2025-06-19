@@ -1,5 +1,5 @@
-import React from 'react';
-import './CountryCard.css';
+import React from "react";
+import "./CountryCard.css";
 
 const CountryCard = ({ name, flag }) => {
   return (
