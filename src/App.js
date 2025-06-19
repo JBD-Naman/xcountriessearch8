@@ -23,7 +23,7 @@ function App() {
   }, []);
 
   const filteredCountries = countries.filter((country) =>
-    country?.name?.common?.toLowerCase().includes(searchTerm.toLowerCase())
+    country?.common?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
