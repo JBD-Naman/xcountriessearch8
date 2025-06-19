@@ -40,8 +40,8 @@ function App() {
           filteredCountries.map((country, index) => (
             <CountryCard
               key={index}
-              name={country.name.common}
-              flag={country.flags.png}
+              name={country.common}
+              flag={country.png}
             />
           ))
         ) : (
