@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import CountryCard from './CountryCard';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
   const [countries, setCountries] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch data from API on initial render
   useEffect(() => {
-    fetch('https://countries-search-data-prod-812920491762.asia-south1.run.app/countries')
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Fetched countries:", data); // Debug: Check the structure
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch(
+          "https://countries-search-data-prod-812920491762.asia-south1.run.app/countries"
+        );
+        const data = await response.json();
         setCountries(data);
-      })
-      .catch((error) => {
-        console.error('API fetch error:', error);
-      });
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    };
+
+    fetchCountries();
   }, []);
 
-  // Filter countries based on search input
-  const filteredCountries = countries.filter((country) => {
-    return (
-      country?.name?.common &&
-      country.name.common.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  const filteredCountries = countries.filter((country) =>
+    (country?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="App">
@@ -36,15 +34,17 @@ function App() {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-
       <div className="countriesContainer">
         {filteredCountries.length > 0 ? (
           filteredCountries.map((country, index) => (
-            <CountryCard
-              key={index}
-              name={country.name.common}
-              flag={country.flags?.png || ''}
-            />
+            <div key={index} className="countryCard">
+              <img
+                src={country.flag}
+                alt={`Flag of ${country.name}`}
+                className="flagImage"
+              />
+              <p>{country.name}</p>
+            </div>
           ))
         ) : (
           <p>No matching countries found</p>

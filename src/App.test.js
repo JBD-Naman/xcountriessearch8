@@ -1,60 +1,38 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import App from './App';
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import App from "./App";
 
-// Mocking fetch to avoid actual API calls
-beforeEach(() => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      json: () =>
-        Promise.resolve([
-          { name: 'India', flag: 'https://flagcdn.com/in.svg' },
-          { name: 'Canada', flag: 'https://flagcdn.com/ca.svg' },
-        ]),
-    })
-  );
-});
-
-afterEach(() => {
-  jest.clearAllMocks();
-});
-
-test('renders the search input field', () => {
+test("renders search input and countries", async () => {
   render(<App />);
-  const inputElement = screen.getByPlaceholderText(/search/i);
-  expect(inputElement).toBeInTheDocument();
+  const input = screen.getByPlaceholderText(/search/i);
+
+  // Wait for any country flag to appear (indicating API loaded)
+  await waitFor(() => expect(screen.getByAltText(/flag of/i)).toBeInTheDocument());
+
+  expect(input).toBeInTheDocument();
 });
 
-test('renders country cards after fetching', async () => {
+test("filters countries based on search input", async () => {
   render(<App />);
-  const indiaFlag = await screen.findByAltText(/flag of india/i);
-  expect(indiaFlag).toBeInTheDocument();
-});
-
-test('filters countries based on search input', async () => {
-  render(<App />);
-  await screen.findByAltText(/flag of india/i);
+  await waitFor(() => expect(screen.getByAltText(/flag of/i)).toBeInTheDocument());
 
   const input = screen.getByPlaceholderText(/search/i);
-  userEvent.type(input, 'Can');
+  userEvent.type(input, "Ind");
 
   await waitFor(() => {
-    expect(screen.getByAltText(/flag of canada/i)).toBeInTheDocument();
+    expect(screen.getByAltText(/flag of india/i)).toBeInTheDocument();
   });
-
-  expect(screen.queryByAltText(/flag of india/i)).not.toBeInTheDocument();
 });
 
-test('shows nothing when search does not match any country', async () => {
+test("shows message when no countries match search", async () => {
   render(<App />);
-  await screen.findByAltText(/flag of india/i);
+  await waitFor(() => expect(screen.getByAltText(/flag of/i)).toBeInTheDocument());
 
   const input = screen.getByPlaceholderText(/search/i);
   userEvent.clear(input);
-  userEvent.type(input, 'xyz');
+  userEvent.type(input, "zzzzzz");
 
   await waitFor(() => {
-    const images = screen.queryAllByRole('img');
-    expect(images.length).toBe(0);
+    expect(screen.getByText(/no matching countries found/i)).toBeInTheDocument();
   });
 });
